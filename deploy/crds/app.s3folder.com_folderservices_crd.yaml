@@ -1,0 +1,98 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: folderservices.app.s3folder.com
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.setupComplete
+    name: SetupComplete
+    type: boolean
+  group: app.s3folder.com
+  names:
+    kind: FolderService
+    listKind: FolderServiceList
+    plural: folderservices
+    singular: folderservice
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: FolderService is the Schema for the folderservices API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            platformSecrets:
+              description: PlatformSecrets defines the secrets to be used by various
+                clouds.
+              properties:
+                aws:
+                  description: AWSPlatformSecrets contains secrets for clusters on
+                    the AWS platform.
+                  properties:
+                    credentials:
+                      description: Credentials refers to a secret that contains the
+                        AWS account access credentials.
+                      properties:
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                      type: object
+                  required:
+                  - credentials
+                  type: object
+                namespace:
+                  type: string
+              required:
+              - aws
+              - namespace
+              type: object
+            userName:
+              description: CertificateSecret is the reference to the secret where
+                certificates are stored.
+              type: string
+            userSecret:
+              description: UserSecret defines the type of Usersecret struct
+              properties:
+                name:
+                  type: string
+              required:
+              - name
+              type: object
+          required:
+          - platformSecrets
+          - userName
+          - userSecret
+          type: object
+        status:
+          description: FolderServiceStatus defines the observed state of FolderService
+          properties:
+            setupComplete:
+              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                of cluster Important: Run "operator-sdk generate k8s" to regenerate
+                code after modifying this file Add custom validation using kubebuilder
+                tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+                Sleep string `json:"sleep"`'
+              type: boolean
+          required:
+          - setupComplete
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
